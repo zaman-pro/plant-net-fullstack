@@ -4,13 +4,16 @@ import Button from "../../components/Shared/Button/Button";
 import PurchaseModal from "../../components/Modal/PurchaseModal";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
+import EmptyState from "../../components/Shared/EmptyState";
 
 const PlantDetails = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const plant = useLoaderData();
+  if (!plant || typeof plant !== "object") {
+    return <EmptyState message="Not Found!" />;
+  }
   const { _id, name, category, description, price, quantity, image, seller } =
     plant;
-
-  const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => {
     setIsOpen(false);
