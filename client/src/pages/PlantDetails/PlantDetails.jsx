@@ -7,8 +7,10 @@ import { useLoaderData } from "react-router";
 
 const PlantDetails = () => {
   const plant = useLoaderData();
-  console.log(plant);
-  let [isOpen, setIsOpen] = useState(false);
+  const { _id, name, category, description, price, quantity, image, seller } =
+    plant;
+
+  const [isOpen, setIsOpen] = useState(false);
 
   const closeModal = () => {
     setIsOpen(false);
@@ -21,28 +23,19 @@ const PlantDetails = () => {
         <div className="flex flex-col gap-6 flex-1">
           <div>
             <div className="w-full overflow-hidden rounded-xl">
-              <img
-                className="object-cover w-full"
-                src="https://i.ibb.co/DDnw6j9/1738597899-golden-money-plant.jpg"
-                alt="header image"
-              />
+              <img className="object-cover w-full" src={image} alt={name} />
             </div>
           </div>
         </div>
         <div className="md:gap-10 flex-1">
           {/* Plant Info */}
-          <Heading
-            title={"Money Plant"}
-            subtitle={`Category: ${"Succulent"}`}
-          />
+          <Heading title={name} subtitle={`Category: ${category}`} />
           <hr className="my-6" />
           <div
             className="
           text-lg font-light text-neutral-500"
           >
-            Professionally deliver sticky testing procedures for next-generation
-            portals. Objectively communicate just in time infrastructures
-            before.
+            {description}
           </div>
           <hr className="my-6" />
 
@@ -56,7 +49,7 @@ const PlantDetails = () => {
                 gap-2
               "
           >
-            <div>Seller: Shakil Ahmed Atik</div>
+            <div>Seller: {seller?.sellerName}</div>
 
             <img
               className="rounded-full"
@@ -64,7 +57,7 @@ const PlantDetails = () => {
               width="30"
               alt="Avatar"
               referrerPolicy="no-referrer"
-              src="https://lh3.googleusercontent.com/a/ACg8ocKUMU3XIX-JSUB80Gj_bYIWfYudpibgdwZE1xqmAGxHASgdvCZZ=s96-c"
+              src={seller?.sellerImage}
             />
           </div>
           <hr className="my-6" />
@@ -76,12 +69,12 @@ const PlantDetails = () => {
                 text-neutral-500
               "
             >
-              Quantity: 10 Units Left Only!
+              Quantity: {quantity} Units Left Only!
             </p>
           </div>
           <hr className="my-6" />
           <div className="flex justify-between">
-            <p className="font-bold text-3xl text-gray-500">Price: 10$</p>
+            <p className="font-bold text-3xl text-gray-500">Price: {price}$</p>
             <div>
               <Button onClick={() => setIsOpen(true)} label="Purchase" />
             </div>
