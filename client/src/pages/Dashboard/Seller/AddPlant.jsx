@@ -8,6 +8,8 @@ import toast from "react-hot-toast";
 const AddPlant = () => {
   const { user } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     setIsUploading(true);
@@ -44,12 +46,25 @@ const AddPlant = () => {
       );
       toast.success("Plant Added Successfully!");
       form.reset();
-
+      setImagePreview(null);
       console.log(data);
     } catch (err) {
       console.log(err);
+      toast.error("Failed to add plant!");
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  // image change handler
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -59,6 +74,8 @@ const AddPlant = () => {
       <AddPlantForm
         handleFormSubmit={handleFormSubmit}
         isUploading={isUploading}
+        imagePreview={imagePreview}
+        handleImageChange={handleImageChange}
       />
     </div>
   );

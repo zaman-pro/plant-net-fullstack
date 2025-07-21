@@ -1,4 +1,9 @@
-const AddPlantForm = ({ handleFormSubmit, isUploading }) => {
+const AddPlantForm = ({
+  handleFormSubmit,
+  isUploading,
+  imagePreview,
+  handleImageChange,
+}) => {
   return (
     <div className="w-full min-h-[calc(100vh-40px)] flex flex-col justify-center items-center text-gray-800 rounded-xl bg-gray-50">
       <form onSubmit={handleFormSubmit}>
@@ -92,6 +97,7 @@ const AddPlantForm = ({ handleFormSubmit, isUploading }) => {
                       name="image"
                       id="image"
                       accept="image/*"
+                      onChange={handleImageChange}
                       hidden
                     />
                     <div className="bg-lime-500 text-white border border-gray-300 rounded font-semibold cursor-pointer p-1 px-3 hover:bg-lime-500">
@@ -99,6 +105,17 @@ const AddPlantForm = ({ handleFormSubmit, isUploading }) => {
                     </div>
                   </label>
                 </div>
+
+                {/* image preview */}
+                {imagePreview && (
+                  <div className="mt-4 flex justify-center">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="h-40 w-40 object-cover rounded-md border border-gray-200"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
