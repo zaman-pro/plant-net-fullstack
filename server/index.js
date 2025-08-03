@@ -4,6 +4,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const jwt = require("jsonwebtoken");
+const stripe = require("stripe")(process.env.STRIPE_SK_KEY);
 
 const port = process.env.PORT || 3000;
 const app = express();
@@ -45,6 +46,7 @@ const client = new MongoClient(process.env.MONGODB_URI, {
 async function run() {
   const db = client.db("plantdb");
   const plantsCollection = db.collection("plants");
+  const ordersCollection = db.collection("orders");
   try {
     // Generate jwt token
     app.post("/jwt", async (req, res) => {
@@ -94,6 +96,32 @@ async function run() {
 
       const result = await plantsCollection.findOne({ _id: new ObjectId(id) });
 
+      res.send(result);
+    });
+
+    // payment intent
+    app.post("/create-payment-intent", async (req, res) => {
+      const { plantId, quantity } = req.body;
+      const plant = await plantsCollection.findOne({
+        _id: new ObjectId(plantId),
+      });
+      if (!plant) return res.status(404).send({ message: "Plant not Found" });
+      const totalPrice = quantity * plant?.price * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: totalPrice,
+        currency: "usd",
+        automatic_payment_methods: {
+          enabled: true,
+        },
+      });
+      res.send({ clientSecret: paymentIntent.client_secret });
+    });
+
+    // save orders data in db
+    app.post("/order", async (req, res) => {
+      const orderData = req.body;
+      const result = await ordersCollection.insertOne(orderData);
       res.send(result);
     });
 

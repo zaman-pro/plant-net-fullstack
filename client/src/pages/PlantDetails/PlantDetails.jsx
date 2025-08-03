@@ -5,8 +5,10 @@ import PurchaseModal from "../../components/Modal/PurchaseModal";
 import { useState } from "react";
 import { useLoaderData } from "react-router";
 import EmptyState from "../../components/Shared/EmptyState";
+import useAuth from "../../hooks/useAuth";
 
 const PlantDetails = () => {
+  const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const plant = useLoaderData();
   if (!plant || typeof plant !== "object") {
@@ -79,12 +81,20 @@ const PlantDetails = () => {
           <div className="flex justify-between">
             <p className="font-bold text-3xl text-gray-500">Price: {price}$</p>
             <div>
-              <Button onClick={() => setIsOpen(true)} label="Purchase" />
+              <Button
+                disabled={!user}
+                onClick={() => setIsOpen(true)}
+                label={user ? "Purchase" : "Log in to Purchase"}
+              />
             </div>
           </div>
           <hr className="my-6" />
 
-          <PurchaseModal closeModal={closeModal} isOpen={isOpen} />
+          <PurchaseModal
+            plant={plant}
+            closeModal={closeModal}
+            isOpen={isOpen}
+          />
         </div>
       </div>
     </Container>

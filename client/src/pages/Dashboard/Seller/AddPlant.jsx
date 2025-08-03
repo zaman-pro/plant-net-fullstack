@@ -30,8 +30,8 @@ const AddPlant = () => {
         name,
         category,
         description,
-        price,
-        quantity,
+        price: parseFloat(price),
+        quantity: parseInt(quantity),
         image: imageUrl,
         seller: {
           sellerName: user?.displayName,
