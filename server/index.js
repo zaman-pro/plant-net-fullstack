@@ -47,6 +47,7 @@ async function run() {
   const db = client.db("plantdb");
   const plantsCollection = db.collection("plants");
   const ordersCollection = db.collection("orders");
+  const usersCollection = db.collection("users");
   try {
     // Generate jwt token
     app.post("/jwt", async (req, res) => {
@@ -118,10 +119,57 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
 
+    // save or update users in db
+    app.post("/user", async (req, res) => {
+      const userData = req.body;
+      userData.role = "customer";
+      userData.created_at = new Date().toISOString();
+      userData.last_loggedIn = new Date().toISOString();
+      const query = {
+        email: userData?.email,
+      };
+      const alreadyExists = await usersCollection.findOne(query);
+
+      if (!!alreadyExists) {
+        // update user
+        const result = await usersCollection.updateOne(query, {
+          $set: { last_loggedIn: new Date().toISOString() },
+        });
+        return res.send(result);
+      }
+      // save user
+      const result = await usersCollection.insertOne(userData);
+      res.send(result);
+    });
+
+    // get a user's role
+    app.get("/user/role/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection.findOne({ email });
+      if (!result) return res.status(404).send({ message: "User Not Fount." });
+      res.send({ role: result?.role });
+    });
+
     // save orders data in db
     app.post("/order", async (req, res) => {
       const orderData = req.body;
       const result = await ordersCollection.insertOne(orderData);
+      res.send(result);
+    });
+
+    // update item quantity (increase or decrease)
+    app.patch("/quantity-update/:id", async (req, res) => {
+      const id = req.params.id;
+      const { quantityToUpdate, status } = req.body;
+      const filter = { _id: new ObjectId(id) };
+
+      const updateDoc = {
+        $inc: {
+          quantity:
+            status === "increase" ? quantityToUpdate : -quantityToUpdate,
+        },
+      };
+      const result = await plantsCollection.updateOne(filter, updateDoc);
       res.send(result);
     });
 
